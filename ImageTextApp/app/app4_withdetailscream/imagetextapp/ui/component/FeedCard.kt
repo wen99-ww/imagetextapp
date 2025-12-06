@@ -1,11 +1,13 @@
 package com.example.imagetextapp.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.BrokenImage
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.imagetextapp.cache.PostCache
 import com.example.imagetextapp.model.Post
 
 @Composable
@@ -30,7 +33,10 @@ fun FeedCard(
             .fillMaxWidth()
             .aspectRatio(0.75f)
             .padding(4.dp)
-            .clickable { onItemClick(post) },  // 添加点击事件
+            .clickable {
+                PostCache.cachePost(post)  // 缓存帖子
+                onItemClick(post)
+                       },  // 添加点击事件
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -41,12 +47,30 @@ fun FeedCard(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
+                val imageUrl = post.clips?.firstOrNull()?.url ?: ""
                 AsyncImage(
-                    model = post.clips.firstOrNull()?.url ?: "",
+                    model = imageUrl,
                     contentDescription = "作品封面",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
+
+                // 添加默认占位图
+                if (imageUrl.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.BrokenImage,
+                            contentDescription = "无封面",
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
 
             // 底部信息区域

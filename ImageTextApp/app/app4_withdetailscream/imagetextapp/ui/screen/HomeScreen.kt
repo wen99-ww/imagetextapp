@@ -1,7 +1,4 @@
-
 package com.example.imagetextapp.ui.screen
-
-// ui/screen/HomeScreen.kt
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -12,10 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.imagetextapp.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     var selectedTab by remember { mutableIntStateOf(3) } // 默认选中社区（索引3）
 
     val tabs = listOf("北京", "团购", "关注", "社区", "推荐")
@@ -65,7 +64,7 @@ fun HomeScreen() {
                 .weight(1f)
         ) {
             when (selectedTab) {
-                3 -> CommunityScreen() // 社区页面
+                3 -> CommunityScreen(navController = navController) // 社区页面
                 else -> PlaceholderScreen("${tabs[selectedTab]}页面开发中...")
             }
         }
@@ -82,4 +81,3 @@ fun PlaceholderScreen(text: String) {
         Text(text = text, style = MaterialTheme.typography.headlineMedium)
     }
 }
-

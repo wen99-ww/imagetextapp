@@ -7,6 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.imagetextapp.cache.PostCache
 import com.example.imagetextapp.model.Post
 import com.example.imagetextapp.ui.screen.DetailScreen
 import com.example.imagetextapp.ui.screen.HomeScreen
@@ -22,7 +23,7 @@ sealed class Screen(val route: String) {
 
 fun NavGraphBuilder.setupNavigation(navController: NavController) {
     composable(Screen.Home.route) {
-        HomeScreen()  // 修复：传递navController参数
+        HomeScreen(navController)  // 修复：传递navController参数
     }
     composable(Screen.Profile.route) {
         ProfileScreen()
@@ -32,16 +33,18 @@ fun NavGraphBuilder.setupNavigation(navController: NavController) {
         arguments = listOf(navArgument("postId") { type = NavType.StringType })
     ) { backStackEntry ->
         val postId = backStackEntry.arguments?.getString("postId") ?: ""
+        val post = PostCache.getPost(postId)
         // 这里需要从数据源获取对应的Post对象
-        val post = getPostById(postId)
+//        val post = getPostById(postId)
         if (post != null) {
             DetailScreen(
-                navController = navController,  // 修复：传递navController参数
+                navController = navController,
                 post = post
             )
         } else {
-            // 处理post为null的情况
-            ErrorScreen(message = "作品不存在: $postId")
+            // 如果找不到帖子，返回并显示错误
+            navController.popBackStack()
+            // 这里可以添加 Toast 提示
         }
     }
 }
